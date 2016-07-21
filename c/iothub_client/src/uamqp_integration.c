@@ -12,6 +12,11 @@
 #include "azure_uamqp_c/amqpvalue.h"
 #include "iothub_message.h"
 
+#ifndef RESULT_OK
+#define RESULT_OK 0
+#define RESULT_FAILURE 1
+#endif
+
 static int addPropertiesTouAMQPMessage(IOTHUB_MESSAGE_HANDLE iothub_message_handle, MESSAGE_HANDLE uamqp_message)
 {
 	int result = RESULT_OK;
@@ -361,7 +366,7 @@ static int readApplicationPropertiesFromuAMQPMessage(IOTHUB_MESSAGE_HANDLE iothu
 
 int IoTHubMessage_CreateFromUamqpMessage(MESSAGE_HANDLE uamqp_message, IOTHUB_MESSAGE_HANDLE* iothubclient_message)
 {
-	int result;
+	int result = __LINE__;
 
 	IOTHUB_MESSAGE_HANDLE iothub_message = NULL;
 	MESSAGE_BODY_TYPE body_type;
@@ -415,15 +420,15 @@ int IoTHubMessage_CreateFromUamqpMessage(MESSAGE_HANDLE uamqp_message, IOTHUB_ME
 
 int message_create_from_iothub_message(IOTHUB_MESSAGE_HANDLE iothub_message, MESSAGE_HANDLE* uamqp_message)
 {
-	int result;
+	int result = __LINE__;
 
 	IOTHUBMESSAGE_CONTENT_TYPE contentType = IoTHubMessage_GetContentType(iothub_message);
-	const unsigned char* messageContent;
-	size_t messageContentSize;
+	const char* messageContent = NULL;
+	size_t messageContentSize = 0;
 	MESSAGE_HANDLE uamqp_message_tmp = NULL;
 
 	if (contentType == IOTHUBMESSAGE_BYTEARRAY &&
-		IoTHubMessage_GetByteArray(iothub_message, &messageContent, &messageContentSize) != IOTHUB_MESSAGE_OK)
+		IoTHubMessage_GetByteArray(iothub_message, &(const unsigned char *)messageContent, &messageContentSize) != IOTHUB_MESSAGE_OK)
 	{
 		LogError("Failed getting the BYTE array representation of the IOTHUB_MESSAGE_HANDLE instance.");
 		result = __LINE__;
@@ -453,7 +458,7 @@ int message_create_from_iothub_message(IOTHUB_MESSAGE_HANDLE iothub_message, MES
 			messageContentSize = strlen(messageContent);
 		}
 
-		binary_data.bytes = messageContent;
+		binary_data.bytes = (const unsigned char *)messageContent;
 		binary_data.length = messageContentSize;
 
 		if (message_add_body_amqp_data(uamqp_message_tmp, binary_data) != RESULT_OK)

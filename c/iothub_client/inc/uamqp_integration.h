@@ -7,11 +7,6 @@
 #include "iothub_message.h"
 #include "azure_uamqp_c/message.h"
 
-#ifndef RESULT_OK
-#define RESULT_OK 0
-#define RESULT_FAILURE 1
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {
